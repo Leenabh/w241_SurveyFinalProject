@@ -31,10 +31,50 @@ table(df$responded_to_survey)
 ```
 
 ```{r}
-table(df$responded_to_survey, df$survey_response_scale, df$survey_number_of_questions)
+plot(table((df$responded_to_survey))/nrow(df)*100, type = "bar")
+```
+
+```{r}
+library(ggplot2)
+# Create a bar chart
+ggplot(df, aes(x = survey_number_of_questions, fill = responded_to_survey)) + 
+  geom_bar(position = "dodge") + 
+  facet_wrap(~survey_response_scale) +
+  labs(title = "Survey Responses by Type and Number of Questions",
+       x = "Number of Questions",
+       y = "Number of Respondents",
+       fill = "Responded") +
+  theme_minimal()
+```
+
+```{r}
+ggplot(df, aes(x = survey_response_scale, fill = responded_to_survey)) + 
+  geom_bar(position = "dodge") + 
+  facet_wrap(~survey_number_of_questions) +
+  labs(title = "Survey Responses by Type and Number of Questions",
+       x = "Response Scale",
+       y = "Number of Respondents",
+       fill = "Responded") +
+  theme_minimal()
+```
+
+
+
+```{r}
+model1 <- lm(data = df, formula = responded_to_survey ~ survey_number_of_questions)
+model2 <- lm(data = df, formula = responded_to_survey ~ survey_response_scale)
+model3 <- lm(data = df, formula = responded_to_survey ~ survey_number_of_questions + survey_response_scale)
+model4 <- lm(data = df, formula = responded_to_survey ~ survey_number_of_questions + survey_response_scale + department + salary_grade)
+model5 <- lm(data = df, formula = responded_to_survey ~ survey_number_of_questions + survey_response_scale + department +salary_grade+ticket_res_time_hours)
+
+```
+
+```{r}
+library(stargazer)
+
+stargazer::stargazer(model1,model2,model3,model4, model5, type="text")
 ```
 
 ```{r}
 
 ```
-
