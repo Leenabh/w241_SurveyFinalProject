@@ -1,0 +1,143 @@
+---
+title: "241_EDA"
+output: pdf_document
+date: "2023-03-15"
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(here)
+library(plotly)
+
+theme_set(theme_minimal())
+knitr::opts_chunk$set(dpi = 300)
+
+```
+
+## EDA
+
+```{r}
+d <- fread("~/Downloads/207_final_proj_data.csv")
+head(d)
+```
+
+
+
+```{r}
+#survey responses by scale
+responses <- d %>% group_by(survey_response_scale,responded_to_survey) %>% 
+        summarise(total_count=n(),.groups = 'drop')
+responses
+
+```
+
+```{r}
+fig <- plot_ly(
+  type = 'bar',
+  x = responses$responded_to_survey,
+  y = responses$total_count,
+  color = responses$survey_response_scale
+    
+  )%>%
+layout(title = 'Number of Responses To Survey',
+       yaxis = list(title = 'Response Total'),
+       xaxis = list(title = 'Responded to Survey Indicator per Survey Type'),
+       legend = list(title=list(text='Survey Type')))
+
+fig%>%
+layout(xaxis= list(
+  ticktext = list('True','False'),
+  tickmode='sync'),
+  type ='category'
+  )
+```
+
+
+
+
+
+
+```{r}
+average_response <- d %>% group_by(department) %>% 
+  summarise(average_response = mean(ticket_res_time_hours),
+            .groups = 'drop')
+average_response
+```
+
+
+
+```{r}
+fig <- plot_ly(
+  type = 'bar',
+  x = average_response$department,
+  y = average_response$average_response,
+  color = average_response$department
+    )%>%
+layout(title = 'Average Ticket Time Resolution',
+       yaxis = list(title = 'Ticket Resolution Time'),
+       xaxis = list(title = 'Department'),
+       legend = list(title=list(text='Department')))
+fig
+```
+```{r}
+average_response <- d %>% group_by(survey_response_scale,survey_number_of_questions,responded_to_survey=TRUE) %>% 
+  summarise(average_response = mean(ticket_res_time_hours),num_responses = n(),
+            .groups = 'drop')
+average_response
+```
+
+```{r}
+fig <- plot_ly(
+  type = 'scatter',
+  y = average_response$num_responses,
+  x = average_response$average_response,
+  size = average_response$num_responses,
+  color = average_response$average_response,
+  hoverinfo = 'text',
+  text = ~paste('</br> Question Type: ', average_response$survey_response_scale,
+                      '</br> Response Time: ', average_response$average_response,
+                      '</br> No of Responses: ',average_response$num_responses,
+                      '</br> Question Numbers: ',average_response$survey_number_of_questions)
+  
+    )%>%
+layout(title = 'Average Ticket Time Resolution (Hours) and Number of Responses',
+       yaxis = list(title = 'Number of Responses'),
+       xaxis = list(title = 'Average Response'),
+       legend = list(title=list(text='Average Response')))
+fig
+```
+
+```{r}
+average_response <- d %>% group_by(survey_response_scale,survey_number_of_questions,responded_to_survey=TRUE,department) %>% 
+  summarise(average_response = mean(ticket_res_time_hours),num_responses = n(),
+            .groups = 'drop')
+average_response
+```
+
+```{r}
+fig <- plot_ly(
+  type = 'scatter',
+  y = average_response$num_responses,
+  x = average_response$average_response,
+  size = average_response$num_responses,
+  color = average_response$department,
+  hoverinfo = 'text',
+  text = ~paste('</br> Question Type: ', average_response$survey_response_scale,
+                      '</br> Response Time: ', average_response$average_response,
+                      '</br> No of Responses: ',average_response$num_responses,
+                      '</br> Question Numbers: ',average_response$survey_number_of_questions,
+                       '</br> Department: ' , average_response$department)
+  
+    )%>%
+layout(title = 'Average Ticket Time Resolution (HR) and Department',
+       yaxis = list(title = 'Number of Responses'),
+       xaxis = list(title = 'Average Response'),
+       legend = list(title=list('Department'))
+       )
+fig
+```
+
+
+
+
+
+
