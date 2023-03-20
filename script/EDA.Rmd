@@ -7,6 +7,7 @@ date: "2023-03-15"
 ```{r setup, message=FALSE, warning=FALSE}
 library(here)
 library(plotly)
+library(dplyr)
 
 theme_set(theme_minimal())
 knitr::opts_chunk$set(dpi = 300)
