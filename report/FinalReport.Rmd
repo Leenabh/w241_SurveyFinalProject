@@ -5,8 +5,16 @@ output: pdf_document
 date: "2023-04-05"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+```{r setup, message=FALSE, warning=FALSE}
+library(here)
+library(plotly)
+library(dplyr)
+library(data.table)
+
+theme_set(theme_minimal())
+knitr::opts_chunk$set(dpi = 300)
+d <- fread("../data/207_final_proj_data.csv")
 ```
 
 ## Abstract
@@ -40,13 +48,41 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 ## Observations and Outcome Measures
 
+We monitored various outcome measures, including the respondents' engagement with the survey, which is determined by their participation or lack thereof. Given the internal nature of the employee surveys, we recorded several key attributes: the employee's department, their salary grade, and the duration required to address the issue outlined in the ticket. Additionally, we took into consideration two treatment factors - the quantity of survey questions and the response scale utilized. The following table provides a detailed breakdown of the outcomes in relation to the two treatment aspects.
+
+```{r}
+#survey responses by scale
+responses <- d %>% group_by(survey_response_scale,survey_number_of_questions) %>% 
+        summarise(total_count=n(),.groups = 'drop')
+
+print(responses)
+```
 
 
-## Data Completeness
+*TODO* Add histogram of the completed ticket requests. Show that it is a right skewed chart. So we need to log it while using it analysis
+
+
+## Data Completeness 
 
 ## Results
+*TODO* Add EDA that shows the graph of rate of completion for each category like a stacked bar chart. The bar chart clearly shows a downward trend as the complexity of the survey increases. Simple survey have higher response rate as compared to the most complex ones. 
+
+
+
+Our analysis reveals a negative correlation between survey complexity and response rate. The simplest survey type, featuring a single binary question, yields the highest response rate at 63.5%. In contrast, the most intricate survey, consisting of a 5-item Likert scale questionnaire, demonstrates the lowest response rate of 23.3%. This suggests that as the survey's complexity increases, participant engagement tends to decrease.
+
+*TODO* Add a Sankey diagram could be used to visualize the flow of respondents through the survey process. For example, you could represent the flow of employees from different departments based on their salary grades, and then show how these groups are further divided based on survey response rates. This would show patterns and trends in employee engagement with survey across the organization.
+
+
+*TODO* Add a chart showing the response rate for the tickets with the number of days it took to complete the requests.
+
+
+Upon analyzing the relationship between ticket resolution time and survey response rates, we observed an inconsistent pattern. Response rates are 44% for same-day resolutions, slightly lower at 42.5% for one-day resolutions, and 42% for two-day resolutions. Interestingly, the response rate significantly increases to 53% for three-day resolutions. This suggests that complex factors influence the relationship, warranting further investigation.
+
 
 ## Regressions
+
+
 
 ## Conclusions
 

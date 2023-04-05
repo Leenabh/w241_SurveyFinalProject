@@ -19,20 +19,18 @@ knitr::opts_chunk$set(dpi = 300)
 
 ```{r}
 d <- fread("../data/207_final_proj_data.csv")
-head(d)
+summary(d)
 ```
 
 
 
 ```{r}
-#survey responses by scale
-responses <- d %>% group_by(survey_response_scale,responded_to_survey) %>% 
-        summarise(total_count=n(),.groups = 'drop')
-responses
-
 ```
 
 ```{r}
+
+## Convert it to a stacked bar chart
+
 fig <- plot_ly(
   type = 'bar',
   x = responses$responded_to_survey,
