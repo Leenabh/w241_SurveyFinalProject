@@ -8,6 +8,7 @@ date: "2023-03-15"
 library(here)
 library(plotly)
 library(dplyr)
+library(data.table)
 
 theme_set(theme_minimal())
 knitr::opts_chunk$set(dpi = 300)
@@ -17,7 +18,7 @@ knitr::opts_chunk$set(dpi = 300)
 ## EDA
 
 ```{r}
-d <- fread("~/Downloads/207_final_proj_data.csv")
+d <- fread("../data/207_final_proj_data.csv")
 head(d)
 ```
 
