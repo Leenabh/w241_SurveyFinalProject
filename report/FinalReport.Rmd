@@ -6,15 +6,19 @@ date: "2023-04-05"
 ---
 
 
-```{r setup, message=FALSE, warning=FALSE}
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
 library(here)
-library(plotly)
+library(ggplot2)
 library(dplyr)
 library(data.table)
+library(networkD3)
+
 
 theme_set(theme_minimal())
 knitr::opts_chunk$set(dpi = 300)
+knitr::opts_chunk$set(echo = FALSE)
 d <- fread("../data/207_final_proj_data.csv")
+
 ```
 
 ## Abstract
@@ -50,31 +54,124 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 We monitored various outcome measures, including the respondents' engagement with the survey, which is determined by their participation or lack thereof. Given the internal nature of the employee surveys, we recorded several key attributes: the employee's department, their salary grade, and the duration required to address the issue outlined in the ticket. Additionally, we took into consideration two treatment factors - the quantity of survey questions and the response scale utilized. The following table provides a detailed breakdown of the outcomes in relation to the two treatment aspects.
 
-```{r}
+```{r echo=FALSE}
 #survey responses by scale
 responses <- d %>% group_by(survey_response_scale,survey_number_of_questions) %>% 
         summarise(total_count=n(),.groups = 'drop')
-
-print(responses)
 ```
 
 
-*TODO* Add histogram of the completed ticket requests. Show that it is a right skewed chart. So we need to log it while using it analysis
+Response Scale| Number of Questions | Total Count
+------------- | ------------- | -------------
+binary | One | `r responses$total_count[1]`
+binary | Three | `r responses$total_count[2]`
+binary | Five | `r responses$total_count[3]`
+likert | One | `r responses$total_count[4]`
+likert | Three | `r responses$total_count[5]`
+likert | Five | `r responses$total_count[6]`
+###### Table 1: Total count of responses by number of questions and response scale
+
+
+```{r echo = FALSE}
+num_bins = 100
+
+# Create a histogram using the plot_ly function from the Plotly library
+histogram <- ggplot(data.frame(d$ticket_res_time_hours), aes(d$ticket_res_time_hours)) +
+  geom_histogram(binwidth = 0.3, fill = "blue", color = "grey") +
+  labs(title = "Time Taken to Complete a Request",
+       x = "Hour (s)",
+       y = "Number of requests")
+
+
+```
+
+```{r}
+print(histogram)
+```
+
+
+The histogram exhibits a right-skewed distribution, with most tickets being resolved within a day, while some tickets taking about three days to resolve . Therefore, it is recommended to apply a logarithmic transformation to the data for more accurate analysis.
 
 
 ## Data Completeness 
 
 ## Results
-*TODO* Add EDA that shows the graph of rate of completion for each category like a stacked bar chart. The bar chart clearly shows a downward trend as the complexity of the survey increases. Simple survey have higher response rate as compared to the most complex ones. 
+
+```{r fig.width=10, echo = FALSE}
+responses_with_type = d %>% group_by(survey_response_scale,survey_number_of_questions, responded_to_survey) %>% 
+        summarize(total_responses = n()) %>%
+        ungroup()
 
 
+data_summarized = responses_with_type %>% 
+  inner_join(responses) %>%
+  mutate(percent = total_responses/total_count*100)
+
+
+stacked_bar_chart <- ggplot(data_summarized, aes(x = interaction(survey_response_scale, survey_number_of_questions,sep = "-"), y = percent, fill = responded_to_survey)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Percentage of Responses by Length and Type of Questions",
+       x = "Length of Questions",
+       y = "Percentage of Responses") +
+  scale_fill_discrete(name = "Type of Questions") +
+  theme_minimal()
+
+# Display the stacked bar chart
+print(stacked_bar_chart)
+```
 
 Our analysis reveals a negative correlation between survey complexity and response rate. The simplest survey type, featuring a single binary question, yields the highest response rate at 63.5%. In contrast, the most intricate survey, consisting of a 5-item Likert scale questionnaire, demonstrates the lowest response rate of 23.3%. This suggests that as the survey's complexity increases, participant engagement tends to decrease.
 
-*TODO* Add a Sankey diagram could be used to visualize the flow of respondents through the survey process. For example, you could represent the flow of employees from different departments based on their salary grades, and then show how these groups are further divided based on survey response rates. This would show patterns and trends in employee engagement with survey across the organization.
+```{r, echo = FALSE, warning=FALSE}
+sankey_df = d %>%
+  group_by(department, salary_grade) %>%
+  summarise(total_responses = n())
+
+sankey_df_2 = d %>%
+  group_by(salary_grade, responded_to_survey) %>%
+  summarise(total_responses = n())
 
 
-*TODO* Add a chart showing the response rate for the tickets with the number of days it took to complete the requests.
+# Sample data: Nodes
+nodes <- data.frame(id = c("Department A", "Department B", "Department C", "Salary Grade 1", "Salary Grade 2", "Salary Grade 3", "Responded", "Not Responded"),
+                    group = c("Department", "Department", "Department", "Salary Grade", "Salary Grade", "Salary Grade", "Response", "Response"))
+
+# Sample data: Links
+links <- data.frame(source = c(0, 0, 0,1, 1,1, 2, 2,2, 3, 3, 4, 4, 5, 5),
+                    target = c(3, 4,5,3, 4, 5, 3, 4, 5, 6, 7, 6, 7, 6, 7),
+                    value = c(sankey_df$total_responses, sankey_df_2$total_responses))
+
+
+
+sankey <- sankeyNetwork(Links = links, Nodes = nodes, Source = "source", Target = "target", Value = "value", NodeID = "id", NodeGroup = "group", fontSize = 14, nodeWidth = 30)
+
+print(sankey)
+```
+
+
+
+```{r, echo = FALSE}
+response_rate_chart <- 
+  d %>%
+  mutate(
+    days_to_complete = floor(ticket_res_time_hours/24)
+  ) %>% group_by(days_to_complete) %>%
+  summarize(total_tickets = n(),
+            responded_tickets = sum(responded_to_survey),
+            response_rate = responded_tickets / total_tickets * 100) %>%
+  filter(days_to_complete < 4) %>%
+  ggplot(aes(x = days_to_complete, y = response_rate)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = "Response Rate by Days to Complete Requests",
+       x = "Days to Complete Requests",
+       y = "Response Rate (%)") +
+  theme_minimal()
+
+# Display the chart
+print(response_rate_chart)
+
+```
+
 
 
 Upon analyzing the relationship between ticket resolution time and survey response rates, we observed an inconsistent pattern. Response rates are 44% for same-day resolutions, slightly lower at 42.5% for one-day resolutions, and 42% for two-day resolutions. Interestingly, the response rate significantly increases to 53% for three-day resolutions. This suggests that complex factors influence the relationship, warranting further investigation.
