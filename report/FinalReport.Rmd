@@ -23,9 +23,7 @@ d <- fread("../data/207_final_proj_data.csv")
 
 ## Abstract
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Internal IT often seeks to improve customer experience and satisfaction. However, targeting satisfaction through customer satisfaction surveys (CSS) is complicated by the tradeoff between survey specificity and response rates. Very simple CSS achieve high response rates but provide teams with little actionable direction, while highly detailed CSS risk statistical bias and uncertainty due to low response rates. In this study, we focus on internal IT at the midsize pharmaceutical company Exelixis and experiment with different types of CSS—ranging from simple thumbs-up/thumbs-down to multiple targeted ordinal questions—to find the type of survey that provides enough actionable and statistically representative information for IT-teams to conduct two-week agile sprints. We find that two- question ordinal CSS provide the optimal tradeoff between response rate and actionable specificity. 
 
 
 ## Background
@@ -35,8 +33,18 @@ You can also embed plots, for example:
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 ## Research Question
+When conducting the experiment to identify the best approach to increase response rates, the following are the research questions that we'd like to answer.
+	1. What is the ideal length and granularity of IT customer satisfaction surveys to optimize the reliability and actionability of information? 
+	2. Are there additional factors that contribute to the response time for customers?
+	3. How does resolution time affect customer response time?
+	4. Does response time differ by department?
 
 ### Hypothesis
+The importance of this experience is to identify an approach that will increase the amount of time the customer will response to the survey. There are different options provided to the customers which include the number of questions and the type of response (Binary or Likert). Based on these approaches, we hypothesize the following:
+	1. Customers who receive low amount of questions are likely to response quicker than those with higher amounts of questions.
+	2. Customers with Binary responses are likely to response to quicker than those with Likert responses. 
+	3. Customers with Binary responses and lower amount of questions are likely to respond quicker than those with Likert responses and low to high amount of questions. 
+
 
 ### Experiment Design
 
