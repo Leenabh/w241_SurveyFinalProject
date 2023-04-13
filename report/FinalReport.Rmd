@@ -12,6 +12,9 @@ library(ggplot2)
 library(dplyr)
 library(data.table)
 library(networkD3)
+library(stargazer)
+library(sandwich)
+library(lmtest)
 
 
 theme_set(theme_minimal())
@@ -186,6 +189,34 @@ Upon analyzing the relationship between ticket resolution time and survey respon
 
 
 ## Regressions
+
+```{r}
+
+## Baseline model
+m1 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions)]
+m1_vcov = vcovHC(m1)
+m1_robust = coeftest(m1, vcoc = m1_vcov)
+
+### Baseline model + interaction for response type
+m2 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions* survey_response_scale)]
+m2_vcov = vcovHC(m2)
+m2_robust = coeftest(m2, vcoc = m2_vcov)
+
+### Baseline model + interaction for response type + controls
+
+m3 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions * survey_response_scale + salary_grade + department + log(ticket_res_time_hours))]
+
+m3_vcov = vcovHC(m3)
+m3_robust = coeftest(m3, vcoc = m3_vcov)
+d
+stargazer(m1_robust, m2_robust,m3_robust ,type = 'text')
+```
+
+In order to analyze the data we specified three different regression models.  Our initial baseline model regresses our binary "responded to survey" variable on the number of questions contained in the survey which took the value of 1, 3 or 5.  We found that surveys with one question had a response rate of 60.5%.  The regression showed that as survyes increased in length from 3 to 5 questions their response rates fell by -17 and -34.6% respectively, both statistically significant results. 
+
+Our second specification added an interaction term denoting the response scale of the survey, likert or binary.  Interestingly, this specification shows that there is no statistically significant effect of response scale to response rates for any of the survey lengths.  
+
+Our final model adds to the interaction specification by adding controls for respondant department, salary grade and the log of a tickets response time.  This log transform was used to the the right hand skew in our ticket resolution time series. The results again show that it only seems that survey length has a statistically significant effect on response rates, however the added controls do increase our point estimates for the decrease in response rates for 3 and 5 questions to -17.6 and -34.9% respectively
 
 
 
