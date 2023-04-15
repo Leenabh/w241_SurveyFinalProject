@@ -27,19 +27,20 @@ d <- fread("../data/207_final_proj_data.csv")
 
 ## Abstract
 
-Internal IT often seeks to improve customer experience and satisfaction. However, targeting satisfaction through customer satisfaction surveys (CSS) is complicated by the trade off between survey specificity and response rates. Very simple CSS achieve high response rates but provide teams with little actionable direction, while highly detailed CSS risk statistical bias and uncertainty due to low response rates. In this study, we focus on internal IT at the midsize pharmaceutical company and experiment with different types of CSS—ranging from simple thumbs-up/thumbs-down to multiple targeted ordinal questions—to find the type of survey that provides enough actionable and statistically representative information for IT-teams to perform productive work. We find that as surveys increase in length from a baseline of 1 question to 3 and 5 questions, their response rates fell by 17% and 34.6% respectively. We further find that response scale does not show a statistically significant effect on response rate. 
+Internal IT often seeks to improve customer experience and satisfaction. However, targeting satisfaction through customer satisfaction surveys (CSS) is complicated by the trade off between survey specificity and response rates. Very simple CSS achieve high response rates but provide teams with little actionable direction, while highly detailed CSS risk statistical bias and uncertainty due to low response rates. In this study, we focus on internal IT at the midsize pharmaceutical company and experiment with different types of CSS—ranging from simple thumbs-up/thumbs-down to multiple targeted ordinal questions—to find the type of survey that provides enough actionable and statistically representative information for IT-teams to perform productive work. We find that as surveys increase in length from a baseline of 1 question to 3 and 5 questions, their response rates fell by 17% and 34.6% respectively. We further find that there is no statistically significant effect on response rate in using a binary or likert response scale. 
 
 ## Introduction 
 
-The tradeoff between CSS specificity and response rates is well documented in the literature. Factors such as question length/amount (e.g., Burchell & Marsh 1992,  Galesic & Bosnjak 2009,  Revilla & Ochoa 2017), survey phrasing (e.g., Ograjenšek & Gal 2011,  Nicolini & Valle 2011 ), and user demographics (e.g., Revilla & Höhne 2020 ) have all been considered. Nevertheless, little work has been done to frame the trade-off from an actionable point of view. We seek to experiment with different types of CSS specificity—in terms of number of questions and response granularity —to identify the type of CSS that would give IT teams optimal direction for actionable improvement over short periods. Setting a discrete target of actionable goals for a short time frame directs the type and quantity of information we collect through CSS rather than simply seeking to maximize information gathered. 
+The tradeoff between CSS specificity and response rates is well documented in the literature. Factors such as question length/amount (e.g., Burchell & Marsh 1992,  Galesic & Bosnjak 2009,  Revilla & Ochoa 2017), survey phrasing (e.g., Ograjenšek & Gal 2011,  Nicolini & Valle 2011 ), and user demographics (e.g., Revilla & Höhne 2020 ) have all been considered. Nevertheless, little work has been done to quantitatively characterize the tradeoff between CSS specificity and response rates from an experimental point of view. 
 
-## Research Questions
+This study partners with an unspecified midsize pharmaceutical company to experiment on the CSS complexity versus response rate tradeoff. IT teams at this company are interested in improving the quality of service delivered and hope to do so by using customer satisfaction surveys. While complex surveys allow IT teams to parse out individual pain-points, the literature suggests that these surveys also lead to low response rates. On the other hand, simple surveys may achieve high response rates, but lack the specificity required for teams to identify where to improve. This study characterizes survey complexity across two dimensions: number of questions and response scale. We experiment with how response rate is effected by the number of questions asked and the response scale deployed. 
 
-1. How does increasing the number of questions on a survey effect response rate? 
-2. Does changing the response scale from likert to binary increase response rate? 
-3. Does ticket resolution time effect response rate? 
+## Research Questions and Hypothesis
 
-### Experimental Design and Mesurement
+1. **How does increasing the number of questions on a survey effect response rate?** We hypothesize that increasing the number of questions on a survey decreases survey response rate. 
+2. **Does changing the response scale from likert to binary increase response rate?** We hypothesize that changing the response scale from likert to binary increases response rate.  
+
+## Experimental Design and Mesurement
 
 When a user raises an issue to the IT help desk, their issue is raised as a “ticket.” These tickets document details relevant to the user’s case. With the ticket raised, the IT help desk assigns a lead “agent” to work on the issue. Users can check the status of their tickets through a web portal. Once the ticket has been resolved, the user can close the ticket through the portal.  
 
@@ -61,7 +62,7 @@ Surveys with one question asked question 1, surveys with three questions asked q
 
 Three covariates are included in the analysis: department, salary grade, and resolution time. Department and salary grade are anonymized in this report due to privacy concerns. For the department covariate, the company was divided into three units: manufacturing and research, business, and IT. For the salary grade, salaries were grouped according to salary quantiles provided by HR corresponding to 0-33%, 33-66%, and 66-100%.  
 
-### Randomization and Enrollment 
+## Randomization and Enrollment 
 
 Surveys were only enabled for each user once. That is, for each user (defined by Active Directory profiles), only the first ticket “closed” during the experimental timeframe received a survey redirect. Randomization was conducted at ticket closure. The process flow is as follows:  
 
@@ -74,7 +75,7 @@ This method ensures that each “participant” of the study is unique and avoid
 
 The power analysis for this study demonstrated that to observe a large true effect, our sample size should be over 500, and to observe a small true effect, our sample size should be over 2500. Our study involved 672 individuals providing us the power to observe a large true effect. 
 
-### Project Timeline
+## Experimental Timeline
 
 The experiment was conducted over a 3 week period from February 13, 2023 to March 3, 2023 (PST). This period was chosen to not correspond with any major business processes (e.g., financial quarter ends) that may have uniformly influenced the urgency of work and subsequent inclination to engage in non-critical tasks.   
 
