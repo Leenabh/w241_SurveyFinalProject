@@ -1,6 +1,7 @@
 ---
-title: "Survey" 
-subtitle : ""
+title: "Optimizing Response Rate in Customer Satisfaction Survey" 
+subtitle : "Datasci 241 - Final Project"
+author: "Connor Ethan Yen, Matthew Dodd, Leena Bhai, and Heather Rodney"
 output: pdf_document
 date: "2023-04-05"
 ---
@@ -26,40 +27,58 @@ d <- fread("../data/207_final_proj_data.csv")
 
 ## Abstract
 
-Internal IT often seeks to improve customer experience and satisfaction. However, targeting satisfaction through customer satisfaction surveys (CSS) is complicated by the tradeoff between survey specificity and response rates. Very simple CSS achieve high response rates but provide teams with little actionable direction, while highly detailed CSS risk statistical bias and uncertainty due to low response rates. In this study, we focus on internal IT at the midsize pharmaceutical company Exelixis and experiment with different types of CSS—ranging from simple thumbs-up/thumbs-down to multiple targeted ordinal questions—to find the type of survey that provides enough actionable and statistically representative information for IT-teams to conduct two-week agile sprints. We find that two- question ordinal CSS provide the optimal tradeoff between response rate and actionable specificity. 
+Internal IT often seeks to improve customer experience and satisfaction. However, targeting satisfaction through customer satisfaction surveys (CSS) is complicated by the trade off between survey specificity and response rates. Very simple CSS achieve high response rates but provide teams with little actionable direction, while highly detailed CSS risk statistical bias and uncertainty due to low response rates. In this study, we focus on internal IT at the midsize pharmaceutical company and experiment with different types of CSS—ranging from simple thumbs-up/thumbs-down to multiple targeted ordinal questions—to find the type of survey that provides enough actionable and statistically representative information for IT-teams to perform productive work. We find that as surveys increase in length from a baseline of 1 question to 3 and 5 questions, their response rates fell by 17% and 34.6% respectively. We further find that response scale does not show a statistically significant effect on response rate. 
 
+## Introduction 
 
-## Background
+The tradeoff between CSS specificity and response rates is well documented in the literature. Factors such as question length/amount (e.g., Burchell & Marsh 1992,  Galesic & Bosnjak 2009,  Revilla & Ochoa 2017), survey phrasing (e.g., Ograjenšek & Gal 2011,  Nicolini & Valle 2011 ), and user demographics (e.g., Revilla & Höhne 2020 ) have all been considered. Nevertheless, little work has been done to frame the trade-off from an actionable point of view. We seek to experiment with different types of CSS specificity—in terms of number of questions and response granularity —to identify the type of CSS that would give IT teams optimal direction for actionable improvement over short periods. Setting a discrete target of actionable goals for a short time frame directs the type and quantity of information we collect through CSS rather than simply seeking to maximize information gathered. 
 
-You can also embed plots, for example:
+## Research Questions
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+1. How does increasing the number of questions on a survey effect response rate? 
+2. Does changing the response scale from likert to binary increase response rate? 
+3. Does ticket resolution time effect response rate? 
 
-## Research Question
-When conducting the experiment to identify the best approach to increase response rates, the following are the research questions that we'd like to answer.
-	1. What is the ideal length and granularity of IT customer satisfaction surveys to optimize the reliability and actionability of information? 
-	2. Are there additional factors that contribute to the response time for customers?
-	3. How does resolution time affect customer response time?
-	4. Does response time differ by department?
+### Experimental Design and Mesurement
 
-### Hypothesis
-The importance of this experience is to identify an approach that will increase the amount of time the customer will response to the survey. There are different options provided to the customers which include the number of questions and the type of response (Binary or Likert). Based on these approaches, we hypothesize the following:
-	1. Customers who receive low amount of questions are likely to response quicker than those with higher amounts of questions.
-	2. Customers with Binary responses are likely to response to quicker than those with Likert responses. 
-	3. Customers with Binary responses and lower amount of questions are likely to respond quicker than those with Likert responses and low to high amount of questions. 
+When a user raises an issue to the IT help desk, their issue is raised as a “ticket.” These tickets document details relevant to the user’s case. With the ticket raised, the IT help desk assigns a lead “agent” to work on the issue. Users can check the status of their tickets through a web portal. Once the ticket has been resolved, the user can close the ticket through the portal.  
 
+One of the features provided by the service management platform is collection of satisfaction surveys. If enabled, users are directed to a survey page immediately after clicking the “close” button on their ticket. We leveraged this feature to perform our experiment. Our team had the advantage of circumventing prior user bias due to former experiences with the survey process since the survey feature had been disabled in early 2020. As the company nearly doubled in size between 2020 and 2023, most users of the ticket platform had never been exposed to internal help desk surveys before this experiment was run.  
 
-### Experiment Design
+The service management platform has a centralized data repository for tickets with rows indexed by unique ticket IDs. Columns for if the survey was sent (True/False), question-1 response (1-5 or +/-), question-2 response (1-5 or +/-), question-3 response (1-5 or +/-), question-4 response (1-5 or +/-), and question-5 response (1-5 or +/-) were added. Thus, survey results populate in the database as field values. We define response to be True if at least one of the values in the “question-1 response” through “question-5 response” columns is not empty. In the case of a positive response, the user successfully clicked “submit” on the survey page. Note that all questions on the survey were required so users who successfully submitted a survey responded to all the survey questions asked. We define response to be False if the “question-1 response” through “question-5 response” columns are all empty. A derived column corresponding to survey response (True/False) was added for ease of analysis.  
+
+The column tracking if the survey was sent automatically populates with “False.” If upon closure of a ticket, the service management platform directs the users browser to the survey page, the “survey sent” column switches to True. In cases where the user did not respond to the survey (i.e., the survey response column is False), the user either closed out of the survey page or had a network timeout. In cases where the survey redirect was blocked by the user’s browser, the “survey sent” column does not always record a consistent value. However, browsers are configured at the enterprise level with default privileges enabling the survey redirect. While it is possible for individual users to have configurations that block the survey redirect, this issue should only exist for a small minority of users.  
+
+For this study we deployed a 2 by 3 design with dimensions of response granularity and number of questions. Response granularity had two levels: binary (a simple thumbs-up and thumbs-down) and likert (one to five scale). The surveys further had either one, three, or five survey questions. The following questions were used:  
+
+1. How satisfied are you with your overall experience of the service desk?
+2. How satisfied are you with the resolution speed of your ticket?
+3. How satisfied are you with the degree of communication provided during the resolution process?
+4. How satisfied are you with the usability of the platform?
+5. How satisfied are you with the resolution provided by the service desk?   
+
+Surveys with one question asked question 1, surveys with three questions asked questions 1 through 3, and surveys with five questions asked questions 1 through 5. Users who received the binary scale option had a green thumbs-up icon and a red thumbs-down icon under each question. Users who received the likert scale option had a 1 through 5 scale under each question with 1 corresponding to “not satisfied” and 5 corresponding to “very satisfied.” The syntactic question format of “how satisfied are you with ______?” was chosen intentionally to keep the complexity of each question constant.   
+
+Three covariates are included in the analysis: department, salary grade, and resolution time. Department and salary grade are anonymized in this report due to privacy concerns. For the department covariate, the company was divided into three units: manufacturing and research, business, and IT. For the salary grade, salaries were grouped according to salary quantiles provided by HR corresponding to 0-33%, 33-66%, and 66-100%.  
+
+### Randomization and Enrollment 
+
+Surveys were only enabled for each user once. That is, for each user (defined by Active Directory profiles), only the first ticket “closed” during the experimental timeframe received a survey redirect. Randomization was conducted at ticket closure. The process flow is as follows:  
+
+1. The user clicks “close” on their ticket.
+2. The platform database collates the user ID on tickets where a survey was sent (i.e. “sent survey” == True).
+3. If the user ID associated with the ticket is NOT in the collated list from step-2, the user is randomly redirected to one of the six surveys (i.e., treatments).
+4. If the user ID associated with the ticket is in the collated list from step-1, the user is redirected to their profile home page.   
+
+This method ensures that each “participant” of the study is unique and avoids dependence between data points. Note that because even populations exist for department and salary grade levels, stratified or quota sampling was not deemed necessary.   
+
+The power analysis for this study demonstrated that to observe a large true effect, our sample size should be over 500, and to observe a small true effect, our sample size should be over 2500. Our study involved 672 individuals providing us the power to observe a large true effect. 
 
 ### Project Timeline
 
-### Measurements 
+The experiment was conducted over a 3 week period from February 13, 2023 to March 3, 2023 (PST). This period was chosen to not correspond with any major business processes (e.g., financial quarter ends) that may have uniformly influenced the urgency of work and subsequent inclination to engage in non-critical tasks.   
 
-### Communications
-
-## Enrollment and Recruitment ?
-
-## Randomization
+The confined time frame also reduced spillage between treatment groups since as the experimental window increases, discussion between coworkers might cause individuals to realize that different satisfaction surveys were being conducted. Nevertheless, because survey response is not a metric reported at an executive level through which survey response would be heavily encouraged, we do not expect spillover effects to be significant.
 
 ## Observations and Outcome Measures
 
@@ -71,7 +90,6 @@ responses <- d %>% group_by(survey_response_scale,survey_number_of_questions) %>
         summarise(total_count=n(),.groups = 'drop')
 ```
 
-
 Response Scale| Number of Questions | Total Count
 ------------- | ------------- | -------------
 binary | One | `r responses$total_count[1]`
@@ -80,8 +98,8 @@ binary | Five | `r responses$total_count[3]`
 likert | One | `r responses$total_count[4]`
 likert | Three | `r responses$total_count[5]`
 likert | Five | `r responses$total_count[6]`
-###### Table 1: Total count of responses by number of questions and response scale
 
+###### Table 1: Total count of responses by number of questions and response scale
 
 ```{r echo = FALSE}
 num_bins = 100
@@ -100,9 +118,7 @@ histogram <- ggplot(data.frame(d$ticket_res_time_hours), aes(d$ticket_res_time_h
 print(histogram)
 ```
 
-
 The histogram exhibits a right-skewed distribution, with most tickets being resolved within a day, while some tickets taking about three days to resolve . Therefore, it is recommended to apply a logarithmic transformation to the data for more accurate analysis.
-
 
 ## Data Completeness 
 
