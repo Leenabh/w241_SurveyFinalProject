@@ -174,46 +174,6 @@ as.data.frame(table(df$department)) %>%
 ```
 \end{center}
 
-These scale of these tabular results can be visualized using a sankey diagram. 
-
-```{r, eval = FALSE}
-sankey_df = d %>%
-  group_by(department, salary_grade) %>%
-  summarise(total_responses = n())
-
-sankey_df_2 = d %>%
-  group_by(salary_grade, responded_to_survey) %>%
-  summarise(total_responses = n())
-
-# Combine the data frames
-sankey_df <- rbind(sankey_df, sankey_df_2)
-
-# Sample data: Nodes
-nodes <- data.frame(id = c("Department A", "Department B", "Department C", "Salary Grade 1", "Salary Grade 2", "Salary Grade 3", "Responded", "Not Responded"),
-                    group = c("Department", "Department", "Department", "Salary Grade", "Salary Grade", "Salary Grade", "Response", "Response"))
-
-# Sample data: Links
-links <- data.frame(source = c(0, 0, 0,1, 1,1, 2, 2,2, 3, 3, 4, 4, 5, 5),
-                    target = c(3, 4,5,3, 4, 5, 3, 4, 5, 6, 7, 6, 7, 6, 7),
-                    value = sankey_df$total_responses)
-
-
-sn <- sankeyNetwork(Links = links, Nodes = nodes, Source = "source", 
-                    Target = "target", Value = "value", NodeID = "id", 
-                    NodeGroup = "group", fontSize = 14, nodeWidth = 30)
-
-# Save the HTML widget as a temporary file
-tmp_file <- tempfile(fileext = ".html")
-htmlwidgets::saveWidget(sn, tmp_file)
-
-# Take a screenshot of the HTML widget and save it as an image file
-webshot(tmp_file, "sankey.png", vwidth = 1200, vheight = 800, zoom = 2, delay = 1)
-```
-
-```{r, out.width = "100%", fig.cap = "Insert Caption"}
-knitr::include_graphics("sankey.png")
-```
-
 We further examine the distribution of ticket response times. 
 
 ```{r, fig.cap = "Histogram of ticket response times for experiment participants."}
