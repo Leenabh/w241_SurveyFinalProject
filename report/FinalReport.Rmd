@@ -18,14 +18,10 @@ header-includes:
 library(tidyverse)
 library(here)
 library(data.table)
-library(networkD3)
 library(stargazer)
 library(sandwich)
 library(lmtest)
 library(knitr)
-library(htmltools)
-library(htmlwidgets)
-library(webshot)
 
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, 
                       fig.align = "center", out.width="70%", dpi = 300)
@@ -199,7 +195,6 @@ $$treatment_i = \beta_0,$$
 
 where $\beta_0$ is the average rate of treatment, and $treatment_i$ is an indicator variable for one of the six treatment groups. The second model is of the form:
 
-
 $$
 \begin{aligned}
   treatment_i = \beta_0 & + \beta_1 \textbf{1}_{dpt = A} + \beta_2 \textbf{1}_{dpt = B} + \beta_3 \textbf{1}_{dpt = C} \\
@@ -210,7 +205,6 @@ $$
                         & + \log(res),
 \end{aligned}
 $$
-
 where $\beta_i$ for represent linear regression coefficients and $\textbf{1}_*$ represent indicator variables that take the value 1 when the subscript condition is true. "Department," "salary grade," and "ticket resolution time" have been abbreviated as "dpt," "grd," and "res" respectively. Simply put, the second model regresses the treatment group on all the combination sof the covariates to see if being in a particular department and salary grade causes the individual to be in a particular group. We then compare the two models with an F-test and report p-values in the table below. 
 
 \begin{center}
@@ -223,7 +217,7 @@ df1 <- df %>%
                 q3_likert = ifelse(t1 == "3 questions" & t2 == "likert", T, F),
                 q5_binary = ifelse(t1 == "5 questions" & t2 == "binary", T, F),
                 q5_likert = ifelse(t1 == "5 questions" & t2 == "likert", T, F)) %>%
-  dplyr::filter(res > 0)
+  dplyr::filter(res > 0) 
 
 # test for imbalance w.r.t. treatment
 data.frame(treat = c("q1_binary", "q1_likert", "q3_binary", "q3_likert", "q5_binary", "q5_likert"), 
@@ -254,8 +248,6 @@ In order to analyze the data we specified three different regression models.  Ou
 Our second specification added an interaction term denoting the response scale of the survey, likert or binary.  Interestingly, this specification shows that there is no statistically significant effect of response scale to response rates for any of the survey lengths.  
 
 Our final model adds to the interaction specification by adding controls for respondant department, salary grade and the log of a tickets response time.  This log transform was used to the the right hand skew in our ticket resolution time series. The results again show that it only seems that survey length has a statistically significant effect on response rates, however the added controls do increase our point estimates for the decrease in response rates for 3 and 5 questions to -17.6 and -34.9% respectively. 
-
-\newpage
 
 
 ```{r, results='asis'}
@@ -288,12 +280,32 @@ stargazer(m1_robust, m2_robust, m3_robust, type = 'latex', header = FALSE,
 
 ## Heterogenous Treatment Effects
 
-```{r}
-# code here
+We test for heterogeneous treatment effects by interacting the treatment variables with different covariates. Results are summarized in the table below. 
 
+\newpage
+```{r, results = 'asis'}
+df2 <- df %>%
+  dplyr::rename_all(~ c('dpt', 'grd', 'res', 't1', 't2', 'y')) %>%
+  dplyr::filter(res > 0)
+
+m_het <- lm(y ~ t1 + t2 + t1*t2 + dpt + grd + dpt*grd + log(res) + 
+              t1*dpt + t1*grd + t2*dpt + t1*grd, data = df2)
+names(m_het$coefficients) <- c("(Intercept)", "3 Questions", "5 Questions", "Likert",
+                               "Dpt B", "Dpt C", "Grd 2", "Grd 3", 
+                               "log(res)", "3 Questions + Likert", "5 Questions + Likert", "Dpt B + Grd 2", 
+                               "Dpt C + grd 2", "Dpt B + Grd 3", "Dpt C + Grd 3", "3 Questions + Dpt B", 
+                               "5 Questions + Dpt B", "3 Questions + Dpt C", 
+                               "5 Question + Dpt C", "3 Questions + Grd 2",
+                               "5 Questions + Grd 2", "3 Questions + Grd 3", 
+                               "5 Questions + Grd 3", "Likert + Dpt B", "Likert + Dpt C")
+m_het$vcovHC_ <- sandwich::vcovHC(m_het)
+robust_se <- sqrt(diag(m_het$vcovHC_))
+ct <- coeftest(m_het, vcov.=m_het$vcovHC_) 
+
+stargazer(ct, type = "latex", se = list(robust_se), single.row = TRUE, no.space = TRUE, 
+          header = FALSE, title = "Regression for Heterogenous Treatment Effects")
 ```
-
-text here. 
+When the treatment variables interact with covariates for department and salary grade, we see that the coefficients for both salary grades 2 and 3 are significant. 
 
 ## Generalizability and Limitations
 
@@ -302,4 +314,6 @@ The experimental population was defined as the set of individuals who "closed" I
 Nevertheless, the results from this study have are useful for teams that agile frameworks. For example, if teams use customer satisfaction surveys to identify or verify actionable pain-points for a discrete subset of individuals, these surveys only need to be sent to those smaller set of individuals. After teams have received results from the survey and worked to improve service accordingly, the next step would be to identify pain-points for a *new* subset of individuals. This process of iterating over targeted user subgroups means that when teams return to a subgroup that had received a survey in the past, a substantial amount of time would have elapsed. This time difference between surveys allows response propensity behavior on the second survey to return to that for the novel first survey. Note that agile teams frequently do not benefit from surveying aggregate populations as discrete action items are hard to identify for very large groups. Thus, this method of iterative surveying over small user subgroups aligns well with agile team workflows. 
 
 # Conclusion
+
+# References
 
