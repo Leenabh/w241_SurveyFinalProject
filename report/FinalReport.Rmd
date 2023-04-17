@@ -2,45 +2,55 @@
 title: "Optimizing Response Rate in Customer Satisfaction Survey" 
 subtitle : "Datasci 241 - Final Project"
 author: "Connor Ethan Yen, Matthew Dodd, Leena Bhai, and Heather Rodney"
-output: pdf_document
-date: "2023-04-05"
+date: "4/19/2023"
+output:
+  pdf_document:
+    number_sections: true
+    fig_caption: yes        
+    includes:  
+      in_header: my_header.tex
+header-includes:
+- \usepackage{placeins}
+- \usepackage{booktabs}
 ---
 
-
-```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
+```{r setup, include=FALSE}
+library(tidyverse)
 library(here)
-library(ggplot2)
-library(dplyr)
 library(data.table)
 library(networkD3)
 library(stargazer)
 library(sandwich)
 library(lmtest)
+library(knitr)
+library(htmltools)
+library(htmlwidgets)
+library(webshot)
 
-
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, 
+                      fig.align = "center", out.width="70%", dpi = 300)
 theme_set(theme_minimal())
-knitr::opts_chunk$set(dpi = 300)
-knitr::opts_chunk$set(echo = FALSE)
-d <- fread("../data/207_final_proj_data.csv")
 
+d <- fread("../data/207_final_proj_data.csv")
+df <- d
 ```
 
-## Abstract
+# Abstract
 
 Internal IT often seeks to improve customer experience and satisfaction. However, targeting satisfaction through customer satisfaction surveys (CSS) is complicated by the trade off between survey specificity and response rates. Very simple CSS achieve high response rates but provide teams with little actionable direction, while highly detailed CSS risk statistical bias and uncertainty due to low response rates. In this study, we focus on internal IT at the midsize pharmaceutical company and experiment with different types of CSS—ranging from simple thumbs-up/thumbs-down to multiple targeted ordinal questions—to find the type of survey that provides enough actionable and statistically representative information for IT-teams to perform productive work. We find that as surveys increase in length from a baseline of 1 question to 3 and 5 questions, their response rates fell by 17% and 34.6% respectively. We further find that there is no statistically significant effect on response rate in using a binary or likert response scale. 
 
-## Introduction 
+# Introduction 
 
 The tradeoff between CSS specificity and response rates is well documented in the literature. Factors such as question length/amount (e.g., Burchell & Marsh 1992,  Galesic & Bosnjak 2009,  Revilla & Ochoa 2017), survey phrasing (e.g., Ograjenšek & Gal 2011,  Nicolini & Valle 2011 ), and user demographics (e.g., Revilla & Höhne 2020 ) have all been considered. Nevertheless, little work has been done to quantitatively characterize the tradeoff between CSS specificity and response rates from an experimental point of view. 
 
 This study partners with an unspecified midsize pharmaceutical company to experiment on the CSS complexity versus response rate tradeoff. IT teams at this company are interested in improving the quality of service delivered and hope to do so by using customer satisfaction surveys. While complex surveys allow IT teams to parse out individual pain-points, the literature suggests that these surveys also lead to low response rates. On the other hand, simple surveys may achieve high response rates, but lack the specificity required for teams to identify where to improve. This study characterizes survey complexity across two dimensions: number of questions and response scale. We experiment with how response rate is effected by the number of questions asked and the response scale deployed. 
 
-## Research Questions and Hypothesis
+# Research Questions and Hypothesis
 
 1. **How does increasing the number of questions on a survey effect response rate?** We hypothesize that increasing the number of questions on a survey decreases survey response rate. 
 2. **Does changing the response scale from likert to binary increase response rate?** We hypothesize that changing the response scale from likert to binary increases response rate.  
 
-## Experimental Design and Mesurement
+# Experimental Design and Mesurement
 
 When a user raises an issue to the IT help desk, their issue is raised as a “ticket.” These tickets document details relevant to the user’s case. With the ticket raised, the IT help desk assigns a lead “agent” to work on the issue. Users can check the status of their tickets through a web portal. Once the ticket has been resolved, the user can close the ticket through the portal.  
 
@@ -52,17 +62,15 @@ The column tracking if the survey was sent automatically populates with “False
 
 For this study we deployed a 2 by 3 design with dimensions of response granularity and number of questions. Response granularity had two levels: binary (a simple thumbs-up and thumbs-down) and likert (one to five scale). The surveys further had either one, three, or five survey questions. The following questions were used:  
 
-1. How satisfied are you with your overall experience of the service desk?
-2. How satisfied are you with the resolution speed of your ticket?
-3. How satisfied are you with the degree of communication provided during the resolution process?
-4. How satisfied are you with the usability of the platform?
-5. How satisfied are you with the resolution provided by the service desk?   
+1. *How satisfied are you with your overall experience of the service desk?*
+2. *How satisfied are you with the resolution speed of your ticket?*
+3. *How satisfied are you with the degree of communication provided during the resolution process?*
+4. *How satisfied are you with the usability of the platform?*
+5. *How satisfied are you with the resolution provided by the service desk?*   
 
 Surveys with one question asked question 1, surveys with three questions asked questions 1 through 3, and surveys with five questions asked questions 1 through 5. Users who received the binary scale option had a green thumbs-up icon and a red thumbs-down icon under each question. Users who received the likert scale option had a 1 through 5 scale under each question with 1 corresponding to “not satisfied” and 5 corresponding to “very satisfied.” The syntactic question format of “how satisfied are you with ______?” was chosen intentionally to keep the complexity of each question constant.   
 
-Three covariates are included in the analysis: department, salary grade, and resolution time. Department and salary grade are anonymized in this report due to privacy concerns. For the department covariate, the company was divided into three units: manufacturing and research, business, and IT. For the salary grade, salaries were grouped according to salary quantiles provided by HR corresponding to 0-33%, 33-66%, and 66-100%.  
-
-## Randomization and Enrollment 
+# Randomization and Enrollment 
 
 Surveys were only enabled for each user once. That is, for each user (defined by Active Directory profiles), only the first ticket “closed” during the experimental timeframe received a survey redirect. Randomization was conducted at ticket closure. The process flow is as follows:  
 
@@ -73,59 +81,41 @@ Surveys were only enabled for each user once. That is, for each user (defined by
 
 This method ensures that each “participant” of the study is unique and avoids dependence between data points. Note that because even populations exist for department and salary grade levels, stratified or quota sampling was not deemed necessary.   
 
-The power analysis for this study demonstrated that to observe a large true effect, our sample size should be over 500, and to observe a small true effect, our sample size should be over 2500. Our study involved 672 individuals providing us the power to observe a large true effect. 
+The power analysis for this study demonstrated that to observe a large true effect (~10% difference between treatments), our sample size should be over 500, and to observe a small true effect (~3% difference between treatments), our sample size should be over 2500. Our study involved 672 individuals providing us the power to observe a large true effect. 
 
-## Experimental Timeline
+# Experimental Timeline
 
 The experiment was conducted over a 3 week period from February 13, 2023 to March 3, 2023 (PST). This period was chosen to not correspond with any major business processes (e.g., financial quarter ends) that may have uniformly influenced the urgency of work and subsequent inclination to engage in non-critical tasks.   
 
 The confined time frame also reduced spillage between treatment groups since as the experimental window increases, discussion between coworkers might cause individuals to realize that different satisfaction surveys were being conducted. Nevertheless, because survey response is not a metric reported at an executive level through which survey response would be heavily encouraged, we do not expect spillover effects to be significant.
 
-## Observations and Outcome Measures
+# Exploratory Data Analysis
 
-We monitored various outcome measures, including the respondents' engagement with the survey, which is determined by their participation or lack thereof. Given the internal nature of the employee surveys, we recorded several key attributes: the employee's department, their salary grade, and the duration required to address the issue outlined in the ticket. Additionally, we took into consideration two treatment factors - the quantity of survey questions and the response scale utilized. The following table provides a detailed breakdown of the outcomes in relation to the two treatment aspects.
+The data has columns for department, salary grade, ticket resolution time, the number of questions on the survey, the survey response scale, and if the user responded to the survey. Department, salary grade, and ticket resolution time represent covariates. It is possible that different cultures associated with different departments and salary grades influence CSS response propensity. Moreover, as the time taken to resolve the ticket increases, we generally expect users to feel more unhappy—it is likely that this affective component also influences response rate. For example, we expect the response rate for junior employees in IT with short ticket times to be different than the response rate for senior employees in Finance with long ticket times. Due to privacy concerns from the partner company, the values for the department and salary grade covarites have been anonymized. In table 1, we present the distribution of response rate by treatment type and in tables 2 through 4, we present the covariate distribution. 
 
-```{r echo=FALSE}
+\newpage
+\begin{center}
+```{r, results='asis'}
+df %>%
+  dplyr::group_by(survey_number_of_questions, survey_response_scale) %>%
+  dplyr::summarise(n = n(),
+                   resp = sum(responded_to_survey), 
+                   per_resp = paste0(round(sum(responded_to_survey)/n() * 100, 1), '%')) %>%
+  dplyr::rename_all(~ c("Number of Questions", "Response Scale", "Count",
+                        "Survey Respondees", "Response Rate")) %>%
+  as.data.frame() %>%
+  knitr::kable(format = "latex", linesep = "", booktabs = TRUE) %>%
+  cat("Table 1: Response rate across different survey types.", 
+      "\n", .,
+      sep = "")
+```
+\end{center}
+
+```{r, fig.cap = "Response rate across different survey types."}
 #survey responses by scale
 responses <- d %>% group_by(survey_response_scale,survey_number_of_questions) %>% 
         summarise(total_count=n(),.groups = 'drop')
-```
 
-Response Scale| Number of Questions | Total Count
-------------- | ------------- | -------------
-binary | One | `r responses$total_count[1]`
-binary | Three | `r responses$total_count[2]`
-binary | Five | `r responses$total_count[3]`
-likert | One | `r responses$total_count[4]`
-likert | Three | `r responses$total_count[5]`
-likert | Five | `r responses$total_count[6]`
-
-###### Table 1: Total count of responses by number of questions and response scale
-
-```{r echo = FALSE}
-num_bins = 100
-
-# Create a histogram using the plot_ly function from the Plotly library
-histogram <- ggplot(data.frame(d$ticket_res_time_hours), aes(d$ticket_res_time_hours)) +
-  geom_histogram(binwidth = 0.3, fill = "blue", color = "grey") +
-  labs(title = "Time Taken to Complete a Request",
-       x = "Hour (s)",
-       y = "Number of requests")
-
-
-```
-
-```{r}
-print(histogram)
-```
-
-The histogram exhibits a right-skewed distribution, with most tickets being resolved within a day, while some tickets taking about three days to resolve . Therefore, it is recommended to apply a logarithmic transformation to the data for more accurate analysis.
-
-## Data Completeness 
-
-## Results
-
-```{r fig.width=10, echo = FALSE}
 responses_with_type = d %>% group_by(survey_response_scale,survey_number_of_questions, responded_to_survey) %>% 
         summarize(total_responses = n()) %>%
         ungroup()
@@ -141,16 +131,38 @@ stacked_bar_chart <- ggplot(data_summarized, aes(x = interaction(survey_response
   labs(title = "Percentage of Responses by Length and Type of Questions",
        x = "Length of Questions",
        y = "Percentage of Responses") +
-  scale_fill_discrete(name = "Type of Questions") +
-  theme_minimal()
+  scale_fill_discrete(name = "Type of Questions") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Display the stacked bar chart
 print(stacked_bar_chart)
 ```
 
-Our analysis reveals a negative correlation between survey complexity and response rate. The simplest survey type, featuring a single binary question, yields the highest response rate at 63.5%. In contrast, the most intricate survey, consisting of a 5-item Likert scale questionnaire, demonstrates the lowest response rate of 23.3%. This suggests that as the survey's complexity increases, participant engagement tends to decrease.
+Our analysis reveals a negative correlation between survey complexity and response rate. The simplest survey type, featuring a single binary question, yields the highest response rate at 63.5%. In contrast, the most intricate survey, consisting of a 5-item Likert scale questionnaire, demonstrates the lowest response rate of 23.3%. This suggests that as the survey's complexity increases, participant engagement tends to decrease. Interestingly, when the number of questions is held constant, changing the response scale from binary to likert only marginally changes response rate. These preliminary results that we are observing a large treatment effect with number of questions but a small treatment effect with response scale. 
 
-```{r, echo = FALSE, warning=FALSE}
+\begin{center}
+```{r, results='asis'}
+as.data.frame(table(df$salary_grade)) %>%
+  dplyr::rename_all(~ c('Grade', 'Count')) %>%
+  knitr::kable(format = "latex", booktabs = TRUE, linesep = "") %>%
+  cat("Table 2: Distribution of salary grades amongst experiment participants", 
+      "\n", ., "\\vspace{0.5cm}", 
+      sep = "")
+```
+  
+```{r, results='asis'}
+as.data.frame(table(df$department)) %>%
+  dplyr::rename_all(~ c('Department', 'Count')) %>%
+  knitr::kable(format = "latex", booktabs = TRUE, linesep = "") %>%
+  cat("Table 3: Distribution of departments amongst experiment participants",
+      "\n", ., "\\vspace{0.5cm}", 
+      sep = "")
+```
+\end{center}
+
+These scale of these tabular results can be visualized using a sankey diagram. 
+
+```{r, eval = FALSE}
 sankey_df = d %>%
   group_by(department, salary_grade) %>%
   summarise(total_responses = n())
@@ -159,6 +171,8 @@ sankey_df_2 = d %>%
   group_by(salary_grade, responded_to_survey) %>%
   summarise(total_responses = n())
 
+# Combine the data frames
+sankey_df <- rbind(sankey_df, sankey_df_2)
 
 # Sample data: Nodes
 nodes <- data.frame(id = c("Department A", "Department B", "Department C", "Salary Grade 1", "Salary Grade 2", "Salary Grade 3", "Responded", "Not Responded"),
@@ -167,47 +181,52 @@ nodes <- data.frame(id = c("Department A", "Department B", "Department C", "Sala
 # Sample data: Links
 links <- data.frame(source = c(0, 0, 0,1, 1,1, 2, 2,2, 3, 3, 4, 4, 5, 5),
                     target = c(3, 4,5,3, 4, 5, 3, 4, 5, 6, 7, 6, 7, 6, 7),
-                    value = c(sankey_df$total_responses, sankey_df_2$total_responses))
+                    value = sankey_df$total_responses)
 
 
+sn <- sankeyNetwork(Links = links, Nodes = nodes, Source = "source", 
+                    Target = "target", Value = "value", NodeID = "id", 
+                    NodeGroup = "group", fontSize = 14, nodeWidth = 30)
 
-sankey <- sankeyNetwork(Links = links, Nodes = nodes, Source = "source", Target = "target", Value = "value", NodeID = "id", NodeGroup = "group", fontSize = 14, nodeWidth = 30)
+# Save the HTML widget as a temporary file
+tmp_file <- tempfile(fileext = ".html")
+htmlwidgets::saveWidget(sn, tmp_file)
 
-print(sankey)
+# Take a screenshot of the HTML widget and save it as an image file
+webshot(tmp_file, "sankey.png", vwidth = 1200, vheight = 800, zoom = 2, delay = 1)
 ```
 
-
-
-```{r, echo = FALSE}
-response_rate_chart <- 
-  d %>%
-  mutate(
-    days_to_complete = floor(ticket_res_time_hours/24)
-  ) %>% group_by(days_to_complete) %>%
-  summarize(total_tickets = n(),
-            responded_tickets = sum(responded_to_survey),
-            response_rate = responded_tickets / total_tickets * 100) %>%
-  filter(days_to_complete < 4) %>%
-  ggplot(aes(x = days_to_complete, y = response_rate)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  labs(title = "Response Rate by Days to Complete Requests",
-       x = "Days to Complete Requests",
-       y = "Response Rate (%)") +
-  theme_minimal()
-
-# Display the chart
-print(response_rate_chart)
-
+```{r, out.width = "100%", fig.cap = "Insert Caption"}
+knitr::include_graphics("sankey.png")
 ```
 
+Upon analyzing the relationship between ticket resolution time and survey response rates, we observed an inconsistent pattern. Response rates are 44% for same-day resolutions, slightly lower at 42.5% for one-day resolutions, and 42% for two-day resolutions. Interestingly, the response rate significantly increases to 53% for three-day resolutions. This suggests that complex factors influence the relationship, warranting further investigation. We further examine the distribution of ticket response times. 
 
+```{r, fig.cap = "Histogram of ticket response times for experiment participants."}
+df %>% 
+  ggplot(aes(x = ticket_res_time_hours)) +
+  geom_histogram(bins = 50, color = 'black', fill = 'lightgrey') + 
+  labs(title = "Distribution of Ticket Response Times", 
+       x = "Ticket Resolution Time", y = "Count")
+```
 
-Upon analyzing the relationship between ticket resolution time and survey response rates, we observed an inconsistent pattern. Response rates are 44% for same-day resolutions, slightly lower at 42.5% for one-day resolutions, and 42% for two-day resolutions. Interestingly, the response rate significantly increases to 53% for three-day resolutions. This suggests that complex factors influence the relationship, warranting further investigation.
+The histogram exhibits a right-skewed distribution, with most tickets being resolved within a day, while some tickets taking about three days to resolve . Therefore, it is recommended to apply a logarithmic transformation to the data for more accurate analysis.
 
+# Data Completeness 
 
-## Regressions
+Insert text here...
 
-```{r}
+# Results
+
+In order to analyze the data we specified three different regression models.  Our initial baseline model regresses our binary "responded to survey" variable on the number of questions contained in the survey which took the value of 1, 3 or 5.  We found that surveys with one question had a response rate of 60.5%.  The regression showed that as survyes increased in length from 3 to 5 questions their response rates fell by -17 and -34.6% respectively, both statistically significant results. 
+
+Our second specification added an interaction term denoting the response scale of the survey, likert or binary.  Interestingly, this specification shows that there is no statistically significant effect of response scale to response rates for any of the survey lengths.  
+
+Our final model adds to the interaction specification by adding controls for respondant department, salary grade and the log of a tickets response time.  This log transform was used to the the right hand skew in our ticket resolution time series. The results again show that it only seems that survey length has a statistically significant effect on response rates, however the added controls do increase our point estimates for the decrease in response rates for 3 and 5 questions to -17.6 and -34.9% respectively
+
+\newpage
+
+```{r, results='asis'}
 
 ## Baseline model
 m1 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions)]
@@ -225,23 +244,12 @@ m3 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_que
 
 m3_vcov = vcovHC(m3)
 m3_robust = coeftest(m3, vcoc = m3_vcov)
-d
-stargazer(m1_robust, m2_robust,m3_robust ,type = 'text')
+
+stargazer(m1_robust, m2_robust, m3_robust, type = 'latex')
 ```
+\newpage
 
-In order to analyze the data we specified three different regression models.  Our initial baseline model regresses our binary "responded to survey" variable on the number of questions contained in the survey which took the value of 1, 3 or 5.  We found that surveys with one question had a response rate of 60.5%.  The regression showed that as survyes increased in length from 3 to 5 questions their response rates fell by -17 and -34.6% respectively, both statistically significant results. 
+# Limitations and Future Enhancements
 
-Our second specification added an interaction term denoting the response scale of the survey, likert or binary.  Interestingly, this specification shows that there is no statistically significant effect of response scale to response rates for any of the survey lengths.  
-
-Our final model adds to the interaction specification by adding controls for respondant department, salary grade and the log of a tickets response time.  This log transform was used to the the right hand skew in our ticket resolution time series. The results again show that it only seems that survey length has a statistically significant effect on response rates, however the added controls do increase our point estimates for the decrease in response rates for 3 and 5 questions to -17.6 and -34.9% respectively
-
-
-
-## Conclusions
-
-## Limitations and Future Enhancements
-
-## Appendix A
-
-
+# Conclusion
 
