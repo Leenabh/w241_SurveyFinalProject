@@ -47,10 +47,12 @@ This study partners with an unspecified midsize pharmaceutical company to experi
 
 # Research Questions and Hypothesis
 
-1. **How does increasing the number of questions on a survey effect response rate?** We hypothesize that increasing the number of questions on a survey decreases survey response rate. 
-2. **Does changing the response scale from likert to binary increase response rate?** We hypothesize that changing the response scale from likert to binary increases response rate.  
+1. How does increasing the number of questions on a survey effect response rate?
+    - We hypothesize that increasing the number of questions on a survey decreases survey response rate.
+2. Does changing the response scale from likert to binary increase response rate?
+    - We hypothesize that changing the response scale from binary to likert decreases response rate.
 
-# Experimental Design and Mesurement
+# Experimental Design
 
 When a user raises an issue to the IT help desk, their issue is raised as a “ticket.” These tickets document details relevant to the user’s case. With the ticket raised, the IT help desk assigns a lead “agent” to work on the issue. Users can check the status of their tickets through a web portal. Once the ticket has been resolved, the user can close the ticket through the portal.  
 
@@ -58,19 +60,30 @@ One of the features provided by the service management platform is collection of
 
 The service management platform has a centralized data repository for tickets with rows indexed by unique ticket IDs. Columns for if the survey was sent (True/False), question-1 response (1-5 or +/-), question-2 response (1-5 or +/-), question-3 response (1-5 or +/-), question-4 response (1-5 or +/-), and question-5 response (1-5 or +/-) were added. Thus, survey results populate in the database as field values. We define response to be True if at least one of the values in the “question-1 response” through “question-5 response” columns is not empty. In the case of a positive response, the user successfully clicked “submit” on the survey page. Note that all questions on the survey were required so users who successfully submitted a survey responded to all the survey questions asked. We define response to be False if the “question-1 response” through “question-5 response” columns are all empty. A derived column corresponding to survey response (True/False) was added for ease of analysis.  
 
-The column tracking if the survey was sent automatically populates with “False.” If upon closure of a ticket, the service management platform directs the users browser to the survey page, the “survey sent” column switches to True. In cases where the user did not respond to the survey (i.e., the survey response column is False), the user either closed out of the survey page or had a network timeout. In cases where the survey redirect was blocked by the user’s browser, the “survey sent” column does not always record a consistent value. However, browsers are configured at the enterprise level with default privileges enabling the survey redirect. While it is possible for individual users to have configurations that block the survey redirect, this issue should only exist for a small minority of users.  
+The column tracking if the survey was sent automatically populates with “False.” If upon closure of a ticket, the service management platform directs the users browser to the survey page, the “survey sent” column switches to True. In cases where the user did not respond to the survey (i.e., the survey response column is False), the user either closed out of the survey page or the page timed-out. In cases where the survey redirect was blocked by the user’s browser, the “survey sent” column does not always record a consistent value. However, browsers are configured at the enterprise level with default privileges enabling the survey redirect. Even for users interested in blocking redirects from general websites to avoid annoying ads, since the survey link is hosted through the company domain, the survey url is necessarily white-listed. While it is possible for individual users to have configurations that block the explicit survey redirect, this issue should only exist for a small minority of users. 
+ 
+## Treatment
 
 For this study we deployed a 2 by 3 design with dimensions of response granularity and number of questions. Response granularity had two levels: binary (a simple thumbs-up and thumbs-down) and likert (one to five scale). The surveys further had either one, three, or five survey questions. The following questions were used:  
 
-1. *How satisfied are you with your overall experience of the service desk?*
-2. *How satisfied are you with the resolution speed of your ticket?*
-3. *How satisfied are you with the degree of communication provided during the resolution process?*
-4. *How satisfied are you with the usability of the platform?*
-5. *How satisfied are you with the resolution provided by the service desk?*   
+1. How satisfied are you with your overall experience of the service desk?
+2. How satisfied are you with the resolution speed of your ticket?
+3. How satisfied are you with the degree of communication provided during the resolution process?
+4. How satisfied are you with the usability of the platform?
+5. How satisfied are you with the resolution provided by the service desk?  
 
-Surveys with one question asked question 1, surveys with three questions asked questions 1 through 3, and surveys with five questions asked questions 1 through 5. Users who received the binary scale option had a green thumbs-up icon and a red thumbs-down icon under each question. Users who received the likert scale option had a 1 through 5 scale under each question with 1 corresponding to “not satisfied” and 5 corresponding to “very satisfied.” The syntactic question format of “how satisfied are you with ______?” was chosen intentionally to keep the complexity of each question constant.   
+The syntactic question format of “how satisfied are you with _____?” was chosen intentionally to keep the complexity of each question constant. Individuals in the study thus receive one of six treatments: 
 
-# Randomization and Enrollment 
+1. Question 1 with binary scale
+2. Question 1 with likert scale
+3. Questions 1-3 with binary scale
+4. Questions 1-3 with likert scale
+5. Questions 1-5 with binary scale
+6. Questions 1-5 with likert scale
+
+Note that binary ratings presented as a thumbs-up or thumbs-down scale under each question while the likert ratings presented as a 1 through 5 scale with 1 corresponding to "not at all satisfied" and 5 corresponding to "very satisfied." 
+
+## Enrollment and Randomization
 
 Surveys were only enabled for each user once. That is, for each user (defined by Active Directory profiles), only the first ticket “closed” during the experimental timeframe received a survey redirect. Randomization was conducted at ticket closure. The process flow is as follows:  
 
@@ -79,11 +92,13 @@ Surveys were only enabled for each user once. That is, for each user (defined by
 3. If the user ID associated with the ticket is NOT in the collated list from step-2, the user is randomly redirected to one of the six surveys (i.e., treatments).
 4. If the user ID associated with the ticket is in the collated list from step-1, the user is redirected to their profile home page.   
 
-This method ensures that each “participant” of the study is unique and avoids dependence between data points. Note that because even populations exist for department and salary grade levels, stratified or quota sampling was not deemed necessary.   
+This method ensures that each “participant” of the study is unique and avoids dependence between data points. The power analysis for this study demonstrated that to observe a large true effect (~10% difference between treatments), our sample size should be over 500, and to observe a small true effect (~3% difference between treatments), our sample size should be over 2500. Our study involved 672 individuals providing us the power to observe a large true effect. 
 
-The power analysis for this study demonstrated that to observe a large true effect (~10% difference between treatments), our sample size should be over 500, and to observe a small true effect (~3% difference between treatments), our sample size should be over 2500. Our study involved 672 individuals providing us the power to observe a large true effect. 
+## Data Completeness 
 
-# Experimental Timeline
+Noncompliance occurs when a user intentionally circumvents the survey redirect after clicking "close" on their ticket. In these cases, we intend for the users to be treated with a survey, but treatment is not delivered. This can occur if the user's enables their browser to block the survey link. However, as mentioned earlier, these settings only exist for a small subset of users. Since $CACE = ITT/\alpha$, for small non-compliance, $\alpha \rightarrow 1$, and $CACE \approx ITT$. 
+
+## Experimental Timeline
 
 The experiment was conducted over a 3 week period from February 13, 2023 to March 3, 2023 (PST). This period was chosen to not correspond with any major business processes (e.g., financial quarter ends) that may have uniformly influenced the urgency of work and subsequent inclination to engage in non-critical tasks.   
 
@@ -93,7 +108,6 @@ The confined time frame also reduced spillage between treatment groups since as 
 
 The data has columns for department, salary grade, ticket resolution time, the number of questions on the survey, the survey response scale, and if the user responded to the survey. Department, salary grade, and ticket resolution time represent covariates. It is possible that different cultures associated with different departments and salary grades influence CSS response propensity. Moreover, as the time taken to resolve the ticket increases, we generally expect users to feel more unhappy—it is likely that this affective component also influences response rate. For example, we expect the response rate for junior employees in IT with short ticket times to be different than the response rate for senior employees in Finance with long ticket times. Due to privacy concerns from the partner company, the values for the department and salary grade covarites have been anonymized. In table 1, we present the distribution of response rate by treatment type and in tables 2 through 4, we present the covariate distribution. 
 
-\newpage
 \begin{center}
 ```{r, results='asis'}
 df %>%
@@ -212,44 +226,52 @@ df %>%
 
 The histogram exhibits a right-skewed distribution, with most tickets being resolved within a day, while some tickets taking about three days to resolve . Therefore, it is recommended to apply a logarithmic transformation to the data for more accurate analysis.
 
-# Data Completeness 
-
-Insert text here...
-
 # Results
+
+## Regression 
 
 In order to analyze the data we specified three different regression models.  Our initial baseline model regresses our binary "responded to survey" variable on the number of questions contained in the survey which took the value of 1, 3 or 5.  We found that surveys with one question had a response rate of 60.5%.  The regression showed that as survyes increased in length from 3 to 5 questions their response rates fell by -17 and -34.6% respectively, both statistically significant results. 
 
 Our second specification added an interaction term denoting the response scale of the survey, likert or binary.  Interestingly, this specification shows that there is no statistically significant effect of response scale to response rates for any of the survey lengths.  
 
-Our final model adds to the interaction specification by adding controls for respondant department, salary grade and the log of a tickets response time.  This log transform was used to the the right hand skew in our ticket resolution time series. The results again show that it only seems that survey length has a statistically significant effect on response rates, however the added controls do increase our point estimates for the decrease in response rates for 3 and 5 questions to -17.6 and -34.9% respectively
+Our final model adds to the interaction specification by adding controls for respondant department, salary grade and the log of a tickets response time.  This log transform was used to the the right hand skew in our ticket resolution time series. The results again show that it only seems that survey length has a statistically significant effect on response rates, however the added controls do increase our point estimates for the decrease in response rates for 3 and 5 questions to -17.6 and -34.9% respectively. 
 
 \newpage
 
-```{r, results='asis'}
 
-## Baseline model
+```{r, results='asis'}
+### Baseline model
 m1 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions)]
+names(m1$coefficients) <- c("(Intercept)", "3 Questions", "5 Questions")
 m1_vcov = vcovHC(m1)
 m1_robust = coeftest(m1, vcoc = m1_vcov)
 
 ### Baseline model + interaction for response type
 m2 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions* survey_response_scale)]
+names(m2$coefficients) <- c("(Intercept)", "3 Questions", "5 Questions", 
+                            "Likert", "3 Questions + Likert", "5 Questions + Likert")
 m2_vcov = vcovHC(m2)
 m2_robust = coeftest(m2, vcoc = m2_vcov)
 
 ### Baseline model + interaction for response type + controls
 
 m3 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions * survey_response_scale + salary_grade + department + log(ticket_res_time_hours))]
-
+names(m3$coefficients) <- c("(Intercept)", "3 Questions", "5 Questions", 
+                            "Likert", "Salary Grade 2", "Salary Grade 3",
+                            "Department B", "Department C", "log(Resolution Time)",
+                            "3 Questions + Likert", "5 Questions + Likert")
 m3_vcov = vcovHC(m3)
 m3_robust = coeftest(m3, vcoc = m3_vcov)
 
-stargazer(m1_robust, m2_robust, m3_robust, type = 'latex')
+stargazer(m1_robust, m2_robust, m3_robust, type = 'latex', header = FALSE, 
+          title = "Comparison Between Regression Coefficients in Causal Linear Models")
 ```
-\newpage
 
-# Limitations and Future Enhancements
+## Generalizability and Limitations
+
+The experimental population was defined as the set of individuals who "closed" IT Help Desk Tickets between February 13, 2023 and March 3, 2023 (PST), where treatment is only assigned the *first time* an individual "closes" a ticket during that time period. Over Q1 2023, the partner company saw rapid growth following several key scientific and business successes. As such, during the duration of the study, there was a large inflow of new employees and contractors which enabled us to collect more unique data points than initially anticipated. However, this study only examines response rate the *first time* an individual receives a survey. As the company's head count stabilizes, repeated survey results will be pulled from a relatively constant population. This study does not quantify the survey complexity versus response rate tradeoff when surveys are requested multiple times to the same population which is frequently the use-case for teams seeking to build satisfaction over time metrics. 
+
+Nevertheless, the results from this study have are useful for teams that agile frameworks. For example, if teams use customer satisfaction surveys to identify or verify actionable pain-points for a discrete subset of individuals, these surveys only need to be sent to those smaller set of individuals. After teams have received results from the survey and worked to improve service accordingly, the next step would be to identify pain-points for a *new* subset of individuals. This process of iterating over targeted user subgroups means that when teams return to a subgroup that had received a survey in the past, a substantial amount of time would have elapsed. This time difference between surveys allows response propensity behavior on the second survey to return to that for the novel first survey. Note that agile teams frequently do not benefit from surveying aggregate populations as discrete action items are hard to identify for very large groups. Thus, this method of iterative surveying over small user subgroups aligns well with agile team workflows. 
 
 # Conclusion
 
