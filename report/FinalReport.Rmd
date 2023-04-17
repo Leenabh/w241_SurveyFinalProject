@@ -214,7 +214,7 @@ webshot(tmp_file, "sankey.png", vwidth = 1200, vheight = 800, zoom = 2, delay = 
 knitr::include_graphics("sankey.png")
 ```
 
-Upon analyzing the relationship between ticket resolution time and survey response rates, we observed an inconsistent pattern. Response rates are 44% for same-day resolutions, slightly lower at 42.5% for one-day resolutions, and 42% for two-day resolutions. Interestingly, the response rate significantly increases to 53% for three-day resolutions. This suggests that complex factors influence the relationship, warranting further investigation. We further examine the distribution of ticket response times. 
+We further examine the distribution of ticket response times. 
 
 ```{r, fig.cap = "Histogram of ticket response times for experiment participants."}
 df %>% 
