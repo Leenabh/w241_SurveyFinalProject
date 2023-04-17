@@ -94,7 +94,7 @@ Surveys were only enabled for each user once. That is, for each user (defined by
 
 This method ensures that each “participant” of the study is unique and avoids dependence between data points. The power analysis for this study demonstrated that to observe a large true effect (~10% difference between treatments), our sample size should be over 500, and to observe a small true effect (~3% difference between treatments), our sample size should be over 2500. Our study involved 672 individuals providing us the power to observe a large true effect. 
 
-## Data Completeness 
+## Data Completeness and Omitted Covariate Bias
 
 Noncompliance occurs when a user intentionally circumvents the survey redirect after clicking "close" on their ticket. In these cases, we intend for the users to be treated with a survey, but treatment is not delivered. This can occur if the user's enables their browser to block the survey link. However, as mentioned earlier, these settings only exist for a small subset of users. Since $CACE = ITT/\alpha$, for small non-compliance, $\alpha \rightarrow 1$, and $CACE \approx ITT$. 
 
@@ -106,7 +106,9 @@ The confined time frame also reduced spillage between treatment groups since as 
 
 # Exploratory Data Analysis
 
-The data has columns for department, salary grade, ticket resolution time, the number of questions on the survey, the survey response scale, and if the user responded to the survey. Department, salary grade, and ticket resolution time represent covariates. It is possible that different cultures associated with different departments and salary grades influence CSS response propensity. Moreover, as the time taken to resolve the ticket increases, we generally expect users to feel more unhappy—it is likely that this affective component also influences response rate. For example, we expect the response rate for junior employees in IT with short ticket times to be different than the response rate for senior employees in Finance with long ticket times. Due to privacy concerns from the partner company, the values for the department and salary grade covarites have been anonymized. In table 1, we present the distribution of response rate by treatment type and in tables 2 through 4, we present the covariate distribution. 
+## Average Treatment Effect
+
+We first tabulate the ATE for each treatment (see Table 1) along with the treatment population size. 
 
 \begin{center}
 ```{r, results='asis'}
@@ -153,6 +155,10 @@ print(stacked_bar_chart)
 ```
 
 Our analysis reveals a negative correlation between survey complexity and response rate. The simplest survey type, featuring a single binary question, yields the highest response rate at 63.5%. In contrast, the most intricate survey, consisting of a 5-item Likert scale questionnaire, demonstrates the lowest response rate of 23.3%. This suggests that as the survey's complexity increases, participant engagement tends to decrease. Interestingly, when the number of questions is held constant, changing the response scale from binary to likert only marginally changes response rate. These preliminary results that we are observing a large treatment effect with number of questions but a small treatment effect with response scale. 
+
+## Covariates
+
+The data has columns for department, salary grade, ticket resolution time, the number of questions on the survey, the survey response scale, and if the user responded to the survey. Department, salary grade, and ticket resolution time represent covariates. It is possible that different cultures associated with different departments and salary grades influence CSS response propensity. Moreover, as the time taken to resolve the ticket increases, we generally expect users to feel more unhappy—it is likely that this affective component also influences response rate. For example, we expect the response rate for junior employees in IT with short ticket times to be different than the response rate for senior employees in Finance with long ticket times. Due to privacy concerns from the partner company, the values for the department and salary grade covarites have been anonymized.
 
 \begin{center}
 ```{r, results='asis'}
