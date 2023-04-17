@@ -45,7 +45,7 @@ The tradeoff between CSS specificity and response rates is well documented in th
 
 This study partners with an unspecified midsize pharmaceutical company to experiment on the CSS complexity versus response rate tradeoff. IT teams at this company are interested in improving the quality of service delivered and hope to do so by using customer satisfaction surveys. While complex surveys allow IT teams to parse out individual pain-points, the literature suggests that these surveys also lead to low response rates. On the other hand, simple surveys may achieve high response rates, but lack the specificity required for teams to identify where to improve. This study characterizes survey complexity across two dimensions: number of questions and response scale. We experiment with how response rate is effected by the number of questions asked and the response scale deployed. 
 
-# Research Questions and Hypothesis
+## Research Questions and Hypothesis
 
 1. How does increasing the number of questions on a survey effect response rate?
     - We hypothesize that increasing the number of questions on a survey decreases survey response rate.
@@ -266,6 +266,15 @@ m3_robust = coeftest(m3, vcoc = m3_vcov)
 stargazer(m1_robust, m2_robust, m3_robust, type = 'latex', header = FALSE, 
           title = "Comparison Between Regression Coefficients in Causal Linear Models")
 ```
+
+## Heterogenous Treatment Effects
+
+```{r}
+# code here
+
+```
+
+text here. 
 
 ## Generalizability and Limitations
 
