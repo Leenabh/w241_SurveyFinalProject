@@ -33,7 +33,7 @@ df <- d
 
 # Abstract
 
-Internal IT often seeks to improve customer experience and satisfaction. However, targeting satisfaction through customer satisfaction surveys (CSS) is complicated by the trade off between survey specificity and response rates. Very simple CSS achieve high response rates but provide teams with little actionable direction, while highly detailed CSS risk statistical bias and uncertainty due to low response rates. In this study, we focus on internal IT at the midsize pharmaceutical company and experiment with different types of CSS—ranging from simple thumbs-up/thumbs-down to multiple targeted ordinal questions—to find the type of survey that provides enough actionable and statistically representative information for IT-teams to perform productive work. We find that as surveys increase in length from a baseline of 1 question to 3 and 5 questions, their response rates fell by 17% and 34.6% respectively. We further find that there is no statistically significant effect on response rate in using a binary or likert response scale. 
+Internal IT often seeks to improve customer experience and satisfaction. However, targeting satisfaction through customer satisfaction surveys (CSS) is complicated by the trade off between survey specificity and response rates. Very simple CSS achieve high response rates but provide teams with little actionable direction, while highly detailed CSS risk statistical bias and uncertainty due to low response rates. In this study, we focus on internal IT at the midsize pharmaceutical company and experiment with different types of CSS—ranging from simple thumbs-up/thumbs-down to multiple targeted ordinal questions—to find the type of survey that provides enough actionable and statistically representative information for IT-teams to perform productive work. We find that as surveys increase in length from a baseline of 1 question to 3 and 5 questions, their response rates fell by 17.6% (6.5%) and 34.9% (6.5%) respectively. We further find that there is no statistically significant effect on response rate in using a binary or likert response scale. Finally, we find that there are no heterogenous treatment effects at the departmental or salary grade levels. 
 
 # Introduction 
 
@@ -90,17 +90,17 @@ Surveys were only enabled for each user once. That is, for each user (defined by
 
 This method ensures that each “participant” of the study is unique and avoids dependence between data points. The power analysis for this study demonstrated that to observe a large true effect (~10% difference between treatments), our sample size should be over 500, and to observe a small true effect (~3% difference between treatments), our sample size should be over 2500. Our study involved 672 individuals providing us the power to observe a large true effect. 
 
-## Data Completeness and Omitted Covariate Bias
-
-Noncompliance occurs when a user intentionally circumvents the survey redirect after clicking "close" on their ticket. In these cases, we intend for the users to be treated with a survey, but treatment is not delivered. This can occur if the user's enables their browser to block the survey link. However, as mentioned earlier, these settings only exist for a small subset of users. Since $CACE = ITT/\alpha$, for small non-compliance, $\alpha \rightarrow 1$, and $CACE \approx ITT$. 
-
-Several key covariates have been omitted due to privacy concerns expressed by the partner company. Potential covariates that might effect response rate are demographic covariates such as age, race, and gender. Moreover, ticket-related covariates such as ticket type and priority plausibly effect response propensity. 
-
 ## Experimental Timeline
 
 The experiment was conducted over a 3 week period from February 13, 2023 to March 3, 2023 (PST). This period was chosen to not correspond with any major business processes (e.g., financial quarter ends) that may have uniformly influenced the urgency of work and subsequent inclination to engage in non-critical tasks.   
 
 The confined time frame also reduced spillage between treatment groups since as the experimental window increases, discussion between coworkers might cause individuals to realize that different satisfaction surveys were being conducted. Nevertheless, because survey response is not a metric reported at an executive level through which survey response would be heavily encouraged, we do not expect spillover effects to be significant.
+
+## Data Completeness and Omitted Covariate Bias
+
+Noncompliance occurs when a user intentionally circumvents the survey redirect after clicking "close" on their ticket. In these cases, we intend for the users to be treated with a survey, but treatment is not delivered. This can occur if the user's enables their browser to block the survey link. However, as mentioned earlier, these settings only exist for a small subset of users. Since $CACE = ITT/\alpha$, for small non-compliance, $\alpha \rightarrow 1$, and $CACE \approx ITT$. 
+
+Several key covariates have been omitted due to privacy concerns expressed by the partner company. Potential covariates that might effect response rate are demographic covariates such as age, race, and gender. Moreover, ticket-related covariates such as ticket type and priority plausibly effect response propensity. 
 
 # Exploratory Data Analysis
 
@@ -197,12 +197,12 @@ where $\beta_0$ is the average rate of treatment, and $treatment_i$ is an indica
 
 $$
 \begin{aligned}
-  treatment_i = \beta_0 & + \beta_1 \textbf{1}_{dpt = A} + \beta_2 \textbf{1}_{dpt = B} + \beta_3 \textbf{1}_{dpt = C} \\
-                        & + \beta_4 \textbf{1}_{grd = 1} + \beta_5 \textbf{1}_{grd = 2} + \beta_6 \textbf{1}_{grd = 3} \\
-                        & + \beta_7 \textbf{1}_{dpt = A}\textbf{1}_{grd = 1} + \beta_8 \textbf{1}_{dpt = A}\textbf{1}_{grd = 2} + \beta_9 \textbf{1}_{dpt = A}\textbf{1}_{grd = 3} \\
-                        & + \beta_{10} \textbf{1}_{dpt = B}\textbf{1}_{grd = 1} + \beta_{11} \textbf{1}_{dpt = B}\textbf{1}_{grd = 2} + \beta_{12} \textbf{1}_{dpt = B}\textbf{1}_{grd = 3} \\
-                        & + \beta_{13} \textbf{1}_{dpt = C}\textbf{1}_{grd = 1} + \beta_{14} \textbf{1}_{dpt = C}\textbf{1}_{grd = 2} + \beta_{15} \textbf{1}_{dpt = C}\textbf{1}_{grd = 3} \\ 
-                        & + \log(res),
+  treatment_i = \beta_0 & + \beta_1 \textbf{1}_{dpt = B} + \beta_2 \textbf{1}_{dpt = C} \\
+                        & + \beta_3 \textbf{1}_{grd = 2} + \beta_4 \textbf{1}_{grd = 3} \\
+                        & + \beta_5 \textbf{1}_{dpt = A}\textbf{1}_{grd = 1} + \beta_6 \textbf{1}_{dpt = A}\textbf{1}_{grd = 2} + \beta_7 \textbf{1}_{dpt = A}\textbf{1}_{grd = 3} \\
+                        & + \beta_{8} \textbf{1}_{dpt = B}\textbf{1}_{grd = 1} + \beta_{9} \textbf{1}_{dpt = B}\textbf{1}_{grd = 2} + \beta_{10} \textbf{1}_{dpt = B}\textbf{1}_{grd = 3} \\
+                        & + \beta_{11} \textbf{1}_{dpt = C}\textbf{1}_{grd = 1} + \beta_{12} \textbf{1}_{dpt = C}\textbf{1}_{grd = 2} + \beta_{13} \textbf{1}_{dpt = C}\textbf{1}_{grd = 3} \\ 
+                        & + \beta_{14}\log(res),
 \end{aligned}
 $$
 where $\beta_i$ for represent linear regression coefficients and $\textbf{1}_*$ represent indicator variables that take the value 1 when the subscript condition is true. "Department," "salary grade," and "ticket resolution time" have been abbreviated as "dpt," "grd," and "res" respectively. Simply put, the second model regresses the treatment group on all the combination sof the covariates to see if being in a particular department and salary grade causes the individual to be in a particular group. We then compare the two models with an F-test and report p-values in the table below. 
@@ -243,12 +243,20 @@ None of the p-values in table 5 are significant at a 5% level. Thus, covariates 
 
 ## Regression 
 
-In order to analyze the data we specified three different regression models.  Our initial baseline model regresses our binary "responded to survey" variable on the number of questions contained in the survey which took the value of 1, 3 or 5.  We found that surveys with one question had a response rate of 60.5%.  The regression showed that as survyes increased in length from 3 to 5 questions their response rates fell by -17 and -34.6% respectively, both statistically significant results. 
+In order to analyze the data we specified three different regression models.  Our initial baseline model regresses our binary "responded to survey" variable on the number of questions contained in the survey which took the value of 1, 3 or 5.  We found that surveys with one question had a response rate of 60.5%.  The regression showed that as surveys increased in length from 3 to 5 questions their response rates fell by -17 and -34.6% respectively, both statistically significant results. 
 
 Our second specification added an interaction term denoting the response scale of the survey, likert or binary.  Interestingly, this specification shows that there is no statistically significant effect of response scale to response rates for any of the survey lengths.  
 
-Our final model adds to the interaction specification by adding controls for respondant department, salary grade and the log of a tickets response time.  This log transform was used to the the right hand skew in our ticket resolution time series. The results again show that it only seems that survey length has a statistically significant effect on response rates, however the added controls do increase our point estimates for the decrease in response rates for 3 and 5 questions to -17.6 and -34.9% respectively. 
+Our final model adds to the interaction specification by adding controls for respondant department, salary grade and the log of a tickets response time.  This log transform was used to the the right hand skew in our ticket resolution time series. The results again show that it only seems that survey length has a statistically significant effect on response rates, however the added controls do increase our point estimates for the decrease in response rates for 3 and 5 questions to -17.6% (6.5%) and -34.9% (6.5%) respectively. This final model is of the form: 
 
+$$
+\begin{aligned}
+  R = \beta_0 & + \beta_1 \textbf{1}_{q = 3} + \beta_2 \textbf{1}_{q = 5} + \beta_3 \textbf{1}_{likert} \\
+              & + \beta_4 \textbf{1}_{dpt = B} + \beta_5 \textbf{1}_{dpt = C} + \beta_6 \textbf{1}_{grd = 2} + \beta_7 \textbf{1}_{grd = 3} + \beta_8 \log(res) \\ 
+              & + \beta_9 \textbf{1}_{q = 3}\textbf{1}_{likert} + \beta_{10} \textbf{1}_{q = 5}\textbf{1}_{likert},
+\end{aligned}
+$$
+where $R$ is response rate, subscript $q$ refers to number of questions, and "department," "salary grade," and "ticket resolution time" have been abbreviated as before. Results are tabulated in the table below. 
 
 ```{r, results='asis'}
 ### Baseline model
@@ -274,7 +282,7 @@ names(m3$coefficients) <- c("(Intercept)", "3 Questions", "5 Questions",
 m3_vcov = vcovHC(m3)
 m3_robust = coeftest(m3, vcoc = m3_vcov)
 
-stargazer(m1_robust, m2_robust, m3_robust, type = 'latex', header = FALSE, 
+stargazer(m1_robust, m2_robust, m3_robust, type = 'latex', header = FALSE, no.space = TRUE, 
           title = "Comparison Between Regression Coefficients in Causal Linear Models")
 ```
 
@@ -282,7 +290,6 @@ stargazer(m1_robust, m2_robust, m3_robust, type = 'latex', header = FALSE,
 
 We test for heterogeneous treatment effects by interacting the treatment variables with different covariates. Results are summarized in the table below. 
 
-\newpage
 ```{r, results = 'asis'}
 df2 <- df %>%
   dplyr::rename_all(~ c('dpt', 'grd', 'res', 't1', 't2', 'y')) %>%
@@ -305,7 +312,8 @@ ct <- coeftest(m_het, vcov.=m_het$vcovHC_)
 stargazer(ct, type = "latex", se = list(robust_se), single.row = TRUE, no.space = TRUE, 
           header = FALSE, title = "Regression for Heterogenous Treatment Effects")
 ```
-When the treatment variables interact with covariates for department and salary grade, we see that the coefficients for both salary grades 2 and 3 are significant. 
+
+When the treatment variables interact with covariates for department and salary grade, we see that the coefficients for both salary grades 2 and 3 are significant. However, none of the interaction terms between treatment and salary grade are significant at a 95% level. Thus, we conclude that there is no observable heterogeneous treatment effect for the covariates included in this study. 
 
 ## Generalizability and Limitations
 
@@ -314,6 +322,8 @@ The experimental population was defined as the set of individuals who "closed" I
 Nevertheless, the results from this study have are useful for teams that agile frameworks. For example, if teams use customer satisfaction surveys to identify or verify actionable pain-points for a discrete subset of individuals, these surveys only need to be sent to those smaller set of individuals. After teams have received results from the survey and worked to improve service accordingly, the next step would be to identify pain-points for a *new* subset of individuals. This process of iterating over targeted user subgroups means that when teams return to a subgroup that had received a survey in the past, a substantial amount of time would have elapsed. This time difference between surveys allows response propensity behavior on the second survey to return to that for the novel first survey. Note that agile teams frequently do not benefit from surveying aggregate populations as discrete action items are hard to identify for very large groups. Thus, this method of iterative surveying over small user subgroups aligns well with agile team workflows. 
 
 # Conclusion
+
+We experiment to quantify how increasing survey complexity decreases response rate. We find that increasing the number of questions on a survey from 1 to 3 questions and then from 1 to 5 questions results in a -17.6% (6.5%) and -34.9% (6.5%) decrease in response rate, respectively. Interestingly, we find that changing the response scale from binary to likert, while keeping the number of questions constant, did not show a statistically significant decrease in response rate. This is not to say, however, that no effect exists. Recall that our power analysis found that to observe a small effect (of the magnitude ~3%), we would need over 2500 individuals. It is likely the case that the treatment effect of changing the response scales on surveys is to small for our experiment to detect. Also of note is that while the first-time survey response rate for the simplest survey (binary 1 question) is high, at 63.6%, further surveys on the same population are likely to experience rapidly declining response rates. Future work should be done to measure the time component of survey treatment. Nevertheless, this study is valuable in showing how the survey complexity to response rate trade off can be quantified in ways that allow teams to design the ideal survey that gives enough information while also maintaining adequate sample representation. 
 
 # References
 
