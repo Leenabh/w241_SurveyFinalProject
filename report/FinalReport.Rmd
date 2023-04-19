@@ -317,3 +317,15 @@ Nevertheless, the results from this study have are useful for teams that agile f
 
 # References
 
+1. Burchell, Brendan, and Catherine Marsh. "The effect of questionnaire length on survey response." *Qual Quant*, Vol. 26, 1992, pp. 233–244. https://doi.org/10.1007/BF00172427.  
+
+2. Galesic, Mirta, and Michael Bosnjak, "Effects of Questionnaire Length on Participation and Indicators of Response Quality in a Web Survey," *Public Opinion Quarterly*, Vol. 73, Issue 2, Summer 2009, pp. 349–360, https://doi.org/10.1093/poq/nfp031.  
+
+3. Nicolini, Giovanna, and Luciana Dalla Valle. “Census and Sample Surveys.” Modern Analysis of Customer Surveys, *John Wiley & Sons, Ltd*, 2011, pp. 37–53, https://doi.org/10.1002/9781119961154.ch3.  
+
+4. Ograjenšek, Irena, and Iddo Gal. “The Concept and Assessment of Customer Satisfaction.” Modern Analysis of Customer Surveys, *John Wiley & Sons, Ltd*, 2011, pp. 107–27, https://doi.org/10.1002/9781119961154.ch7.  
+
+5. Revilla, Melanie, and Carlos Ochoa. "Ideal and Maximum Length for a Web Survey." *International Journal of Market Research*, Vol. 59, Issue 5, 2017, pp. 557–565. https://doi.org/10.2501/IJMR-2017-039.  
+
+6. Revilla, Melanie, and Jan Karem Höhne. "How long do respondents think online surveys should be? New evidence from two online panels in Germany." *International Journal of Market Research*, Vol. 62, Issue 5, 2020, pp. 538–545. https://doi.org/10.1177/1470785320943049. 
+
