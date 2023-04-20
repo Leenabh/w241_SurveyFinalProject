@@ -245,7 +245,7 @@ None of the p-values in table 5 are significant at a 5% level. Thus, covariates 
 
 In order to analyze the data we specified three different regression models.  Our initial baseline model regresses our binary "responded to survey" variable on the number of questions contained in the survey which took the value of 1, 3 or 5.  We found that surveys with one question had a response rate of 60.5%.  The regression showed that as surveys increased in length from 3 to 5 questions their response rates fell by -17 and -34.6% respectively, both statistically significant results. 
 
-Our second specification added an interaction term denoting the response scale of the survey, likert or binary.  Interestingly, this specification shows that there is no statistically significant effect of response scale to response rates for any of the survey lengths.  
+Our second specification added the binary/likert response scale treatment. Interestingly, this specification shows that there is no statistically significant effect of response scale to response rates for any of the survey lengths even though there is a strict decrease in response rate between binary and likert scaled surveys when holding survey length constant. 
 
 Our final model adds to the interaction specification by adding controls for respondant department, salary grade and the log of a tickets response time.  This log transform was used to the the right hand skew in our ticket resolution time series. The results again show that it only seems that survey length has a statistically significant effect on response rates, however the added controls do increase our point estimates for the decrease in response rates for 3 and 5 questions to -17.6% (6.5%) and -34.9% (6.5%) respectively. This final model is of the form: 
 
@@ -259,16 +259,15 @@ $$
 where $R$ is response rate, subscript $q$ refers to number of questions, and "department," "salary grade," and "ticket resolution time" have been abbreviated as before. Results are tabulated in the table below. 
 
 ```{r, results='asis'}
-### Baseline model
+### Baseline model | # questions
 m1 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions)]
 names(m1$coefficients) <- c("(Intercept)", "3 Questions", "5 Questions")
 m1_vcov = vcovHC(m1)
 m1_robust = coeftest(m1, vcoc = m1_vcov)
 
-### Baseline model + interaction for response type
-m2 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions* survey_response_scale)]
-names(m2$coefficients) <- c("(Intercept)", "3 Questions", "5 Questions", 
-                            "Likert", "3 Questions + Likert", "5 Questions + Likert")
+### Baseline model | # questions + response scale
+m2 = d[ticket_res_time_hours != 0, lm(responded_to_survey ~ survey_number_of_questions + survey_response_scale)]
+names(m2$coefficients) <- c("(Intercept)", "3 Questions", "5 Questions", "Likert")
 m2_vcov = vcovHC(m2)
 m2_robust = coeftest(m2, vcoc = m2_vcov)
 
@@ -300,7 +299,7 @@ m_het <- lm(y ~ t1 + t2 + t1*t2 + dpt + grd + dpt*grd + log(res) +
 names(m_het$coefficients) <- c("(Intercept)", "3 Questions", "5 Questions", "Likert",
                                "Dpt B", "Dpt C", "Grd 2", "Grd 3", 
                                "log(res)", "3 Questions + Likert", "5 Questions + Likert", "Dpt B + Grd 2", 
-                               "Dpt C + grd 2", "Dpt B + Grd 3", "Dpt C + Grd 3", "3 Questions + Dpt B", 
+                               "Dpt C + Grd 2", "Dpt B + Grd 3", "Dpt C + Grd 3", "3 Questions + Dpt B", 
                                "5 Questions + Dpt B", "3 Questions + Dpt C", 
                                "5 Question + Dpt C", "3 Questions + Grd 2",
                                "5 Questions + Grd 2", "3 Questions + Grd 3", 
